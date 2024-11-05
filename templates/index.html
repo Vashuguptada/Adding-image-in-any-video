@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Overlay Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #4a90e2;
+        }
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: auto;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="file"],
+        input[type="number"],
+        input[type="submit"] {
+            width: calc(100% - 10px);
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            transition: border-color 0.3s;
+        }
+        input[type="file"]:hover,
+        input[type="number"]:hover {
+            border-color: #4a90e2;
+        }
+        input[type="submit"] {
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #357ab8;
+        }
+        #videoPreview {
+            position: relative;
+            display: inline-block;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 640px;
+        }
+        #videoElement {
+            width: 100%;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        #overlayImage {
+            position: absolute;
+            pointer-events: none; /* Prevent mouse events on the overlay */
+            transition: all 0.3s ease; /* Smooth transition for overlay image */
+        }
+    </style>
+</head>
+<body>
+    <h1>Video Overlay Tool</h1>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <label for="video">Upload Video:</label>
+        <input type="file" name="video" accept=".mp4, .avi, .mov" required><br>
+
+        <label for="image">Upload Image:</label>
+        <input type="file" name="image" accept=".png, .jpg, .jpeg" required><br>
+
+        <label for="x_position">X Position:</label>
+        <input type="number" id="x_position" name="x_position" value="0" onchange="updateOverlay()"><br>
+
+        <label for="y_position">Y Position:</label>
+        <input type="number" id="y_position" name="y_position" value="0" onchange="updateOverlay()"><br>
+
+        <label for="image_width">Image Width (px):</label>
+        <input type="number" id="image_width" name="image_width" value="100" onchange="updateOverlay()"><br>
+
+        <label for="image_height">Image Height (px):</label>
+        <input type="number" id="image_height" name="image_height" value="100" onchange="updateOverlay()"><br>
+
+        <label for="start_time">Start Time (seconds):</label>
+        <input type="number" id="start_time" name="start_time" value="0"><br>
+
+        <label for="end_time">End Time (seconds):</label>
+        <input type="number" id="end_time" name="end_time" value="0"><br>
+
+        <input type="submit" value="Upload and Process">
+    </form>
+
+    <div id="videoPreview">
+        <video id="videoElement" controls>
+            <source src="" id="videoSource" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <img id="overlayImage" src="" alt="Overlay Image" style="display: none;">
+    </div>
+
+    <script>
+        const videoElement = document.getElementById('videoElement');
+        const overlayImage = document.getElementById('overlayImage');
+
+        function updateOverlay() {
+            // Get the user inputs for x and y positions
+            const x = parseInt(document.getElementById('x_position').value);
+            const y = parseInt(document.getElementById('y_position').value);
+            const width = parseInt(document.getElementById('image_width').value);
+            const height = parseInt(document.getElementById('image_height').value);
+            const imageFile = document.querySelector('input[name="image"]').files[0];
+
+            if (imageFile) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    overlayImage.src = event.target.result; // Set the overlay image
+                    overlayImage.style.width = `${width}px`; // Set the overlay image width
+                    overlayImage.style.height = `${height}px`; // Set the overlay image height
+                    overlayImage.style.left = `${x}px`; // Position the image
+                    overlayImage.style.top = `${y}px`;
+                    overlayImage.style.display = 'block'; // Make the image visible
+                };
+                reader.readAsDataURL(imageFile);
+            }
+        }
+
+        // Function to set the video source dynamically
+        document.querySelector('input[name="video"]').addEventListener('change', function(event) {
+            const videoFile = event.target.files[0];
+            if (videoFile) {
+                const videoUrl = URL.createObjectURL(videoFile);
+                videoSource.src = videoUrl;
+                videoElement.load(); // Load the new video
+            }
+        });
+    </script>
+</body>
+</html>

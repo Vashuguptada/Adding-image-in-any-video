@@ -1,0 +1,12 @@
+Flask
+opencv-python-headless
+numpy
+werkzeug
+click
+gunicorn
+importlib-metadata
+itsdangerous
+Jinja2
+MarkupSafe
+Werkzeug
+zipp
